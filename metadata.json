@@ -1,0 +1,8 @@
+{
+  "name": "Fioretto Tracker",
+  "description": "Un'app in stile iPhone per tracciare i tuoi piccoli sacrifici quotidiani (fioretti), con premi, notifiche e assistenza AI.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ]
+}
