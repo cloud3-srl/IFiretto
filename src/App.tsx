@@ -71,7 +71,97 @@ const Logo = () => {
   );
 };
 
+const SplashScreen = ({ onComplete }: { onComplete: () => void }) => {
+  return (
+    <motion.div
+      initial={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.8, ease: "easeInOut" }}
+      onAnimationComplete={() => {}}
+      className="fixed inset-0 z-[100] bg-[#050505] flex flex-col items-center justify-center overflow-hidden"
+    >
+      {/* Background Light Effects */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <motion.div 
+          animate={{ 
+            scale: [1, 1.2, 1],
+            opacity: [0.3, 0.5, 0.3],
+            x: [-20, 20, -20],
+            y: [-20, 20, -20]
+          }}
+          transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
+          className="absolute -top-1/4 -left-1/4 w-full h-full bg-ios-blue/10 blur-[120px] rounded-full"
+        />
+        <motion.div 
+          animate={{ 
+            scale: [1.2, 1, 1.2],
+            opacity: [0.2, 0.4, 0.2],
+            x: [20, -20, 20],
+            y: [20, -20, 20]
+          }}
+          transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
+          className="absolute -bottom-1/4 -right-1/4 w-full h-full bg-purple-500/10 blur-[120px] rounded-full"
+        />
+      </div>
+
+      {/* Logo Container */}
+      <div className="relative">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9, y: 10 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
+          className="flex flex-col items-center"
+        >
+          <div className="relative group">
+            <h1 className="text-5xl font-bold tracking-tighter text-white flex items-baseline">
+              <span className="text-ios-blue relative">
+                i
+                <motion.span 
+                  initial={{ opacity: 0, scale: 0 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: 0.8, duration: 0.5 }}
+                  className="absolute -top-1 -right-1 w-2 h-2 bg-white rounded-full shadow-[0_0_10px_rgba(255,255,255,0.8)]"
+                />
+              </span>
+              <span className="bg-clip-text text-transparent bg-gradient-to-b from-white to-white/60 ml-1">
+                Fioretto
+              </span>
+            </h1>
+            
+            {/* Light Sweep Effect */}
+            <motion.div 
+              initial={{ x: '-150%' }}
+              animate={{ x: '150%' }}
+              transition={{ delay: 1.2, duration: 1.5, ease: "easeInOut" }}
+              className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent skew-x-12 pointer-events-none"
+            />
+          </div>
+          
+          <motion.p 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 0.4 }}
+            transition={{ delay: 1.5, duration: 1 }}
+            className="mt-4 text-[10px] uppercase tracking-[0.3em] font-medium text-white/80"
+          >
+            Premium Experience
+          </motion.p>
+        </motion.div>
+      </div>
+
+      {/* Loading Indicator */}
+      <motion.div 
+        initial={{ width: 0 }}
+        animate={{ width: 120 }}
+        transition={{ delay: 0.5, duration: 2, ease: "easeInOut" }}
+        onAnimationComplete={() => setTimeout(onComplete, 500)}
+        className="absolute bottom-20 h-[1px] bg-gradient-to-r from-transparent via-ios-blue to-transparent"
+      />
+    </motion.div>
+  );
+};
+
 export default function App() {
+  const [showSplash, setShowSplash] = useState(true);
   const [fioretti, setFioretti] = useState<Fioretto[]>(() => {
     const saved = localStorage.getItem('fioretti');
     return saved ? JSON.parse(saved) : [];
@@ -259,10 +349,23 @@ export default function App() {
 
   return (
     <div className="flex flex-col h-screen max-w-md mx-auto bg-ios-background overflow-hidden relative shadow-2xl">
+      <AnimatePresence>
+        {showSplash && (
+          <SplashScreen onComplete={() => setShowSplash(false)} />
+        )}
+      </AnimatePresence>
+
       {/* Status Bar Mockup */}
       <div className="h-12 flex items-center justify-between px-6 pt-4 bg-transparent z-50">
-        <span className="text-sm font-semibold">9:41</span>
-        <div className="flex items-center gap-1.5">
+        <div className="flex-1">
+          <span className="text-sm font-semibold">9:41</span>
+        </div>
+        
+        <div className="flex-1 flex justify-center scale-75 origin-center">
+          <Logo />
+        </div>
+
+        <div className="flex-1 flex items-center justify-end gap-1.5">
           <div className="w-4 h-4 rounded-full border-2 border-black/20" />
           <div className="w-4 h-4 rounded-full border-2 border-black/20" />
           <div className="w-6 h-3 rounded-sm border border-black/20 relative">
@@ -273,21 +376,15 @@ export default function App() {
 
       {/* Header */}
       <header className="px-6 py-4 ios-blur sticky top-0 z-40">
-        <div className="flex items-center justify-between relative">
-          <div className="flex-1">
-            <h1 className="text-2xl font-bold tracking-tight">
-              {activeTab === 'today' && "Oggi"}
-              {activeTab === 'history' && "Cronologia"}
-              {activeTab === 'rewards' && "Premi"}
-              {activeTab === 'ai' && "Assistente AI"}
-            </h1>
-          </div>
-          
-          <div className="absolute left-1/2 -translate-x-1/2">
-            <Logo />
-          </div>
+        <div className="flex items-center justify-between">
+          <h1 className="text-2xl font-bold tracking-tight">
+            {activeTab === 'today' && "Oggi"}
+            {activeTab === 'history' && "Cronologia"}
+            {activeTab === 'rewards' && "Premi"}
+            {activeTab === 'ai' && "Assistente AI"}
+          </h1>
 
-          <div className="flex-1 flex justify-end gap-3">
+          <div className="flex items-center gap-3">
             <button 
               onClick={() => fileInputRef.current?.click()}
               className="p-2 rounded-full bg-gray-100 text-ios-blue active:scale-90 transition-transform"
@@ -348,6 +445,32 @@ export default function App() {
                 <p className="text-[10px] mt-2 text-blue-100 italic">
                   "Ogni piccolo passo conta per la tua crescita."
                 </p>
+              </div>
+
+              {/* Upcoming Notifications Preview */}
+              <div className="space-y-3">
+                <h2 className="text-xs font-bold text-ios-gray uppercase px-1">Prossime Notifiche</h2>
+                <div className="space-y-2">
+                  {fioretti.filter(f => f.status === 'active' && !f.completedDays.includes(format(new Date(), 'yyyy-MM-dd'))).slice(0, 2).map((f, i) => (
+                    <div key={`notif-${f.id}`} className="bg-white/50 backdrop-blur-sm border border-gray-100 rounded-2xl p-3 flex items-center gap-3 shadow-sm">
+                      <div className="bg-ios-blue/10 p-2 rounded-xl">
+                        <Bell size={16} className="text-ios-blue" />
+                      </div>
+                      <div className="flex-1">
+                        <div className="flex justify-between items-center">
+                          <p className="text-xs font-bold">Promemoria Fioretto</p>
+                          <span className="text-[10px] text-ios-gray">{i === 0 ? "18:30" : "21:00"}</span>
+                        </div>
+                        <p className="text-xs text-ios-gray">Non dimenticare: {f.title}</p>
+                      </div>
+                    </div>
+                  ))}
+                  {fioretti.filter(f => f.status === 'active' && !f.completedDays.includes(format(new Date(), 'yyyy-MM-dd'))).length === 0 && (
+                    <div className="bg-white/50 backdrop-blur-sm border border-gray-100 rounded-2xl p-4 text-center">
+                      <p className="text-xs text-ios-gray italic">Tutto completato per oggi! ✨</p>
+                    </div>
+                  )}
+                </div>
               </div>
 
               <div className="space-y-4">
